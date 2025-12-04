@@ -1,10 +1,30 @@
 # EEL-Activity-8
 #include <stdio.h>
 
-int strLen(char s[]) {
-    int i = 0; while (s[i] != '\0') i++; return i;
+// simple copy
+void strCopy(char d[], char s[]) {
+    int i = 0;
+    while (s[i] != '\0') {
+        d[i] = s[i];
+        i++;
+    }
+    d[i] = '\0';
 }
 
+// simple concatenation (add s at end of d)
+void strConcat(char d[], char s[]) {
+    int i = 0, j = 0;
+
+    while (d[i] != '\0')   // move to end of d
+        i++;
+
+    while (s[j] != '\0')   // copy s after it
+        d[i++] = s[j++];
+
+    d[i] = '\0';           // close final string
+}
+
+// simple compare (1 = same, 0 = different)
 int strCmp(char a[], char b[]) {
     int i = 0;
     while (a[i] != '\0' || b[i] != '\0') {
@@ -14,26 +34,16 @@ int strCmp(char a[], char b[]) {
     return 1;
 }
 
-void strCopy(char d[], char s[]) {
-    int i = 0;
-    while (s[i] != '\0') { d[i] = s[i]; i++; }
-    d[i] = '\0';
-}
-
-void strConcat(char d[], char a[], char b[]) {
-    int i = 0, j = 0;
-    while (a[j] != '\0') d[i++] = a[j++];
-    j = 0;
-    while (b[j] != '\0') d[i++] = b[j++];
-    d[i] = '\0';
-}
-
 int main() {
     char reg[40], name[40], movie[40];
-    char ticket[150], temp[150];
+    char ticket[200];
+    FILE *f;
 
-    printf("Registered name: "); scanf("%s", reg);
-    printf("Enter your name: "); scanf("%s", name);
+    printf("Registered name: ");
+    scanf("%s", reg);
+
+    printf("Enter your name: ");
+    scanf("%s", name);
 
     if (!strCmp(reg, name)) {
         printf("Name mismatch! Entry denied.\n");
@@ -43,21 +53,27 @@ int main() {
     printf("Enter movie title (no spaces): ");
     scanf("%s", movie);
 
-    int len = strLen(movie);
-    if (len < 2 || len > 30) {
-        printf("Invalid title length!\n");
-        return 0;
-    }
-
+    // build ticket using only strCopy + strConcat
     strCopy(ticket, "Name: ");
-    strConcat(ticket, ticket, name);
+    strConcat(ticket, name);
+    strConcat(ticket, " | Movie: ");
+    strConcat(ticket, movie);
+    strConcat(ticket, " | Time: 7PM | Seat: A12");
 
-    strCopy(temp, " | Movie: ");
-    strConcat(ticket, ticket, temp);
-    strConcat(ticket, ticket, movie);
+    // write to file
+    f = fopen("ticket.txt", "w");
+    fprintf(f, "%s", ticket);
+    fclose(f);
 
-    strConcat(ticket, ticket, " | Time: 7PM | Seat: A12");
+    // read file
+    f = fopen("ticket.txt", "r");
+    fscanf(f, "%[^\n]", ticket);
+    fclose(f);
 
     printf("\n--- FINAL TICKET ---\n%s\nEntry Granted!\n", ticket);
+
     return 0;
 }
+
+
+
